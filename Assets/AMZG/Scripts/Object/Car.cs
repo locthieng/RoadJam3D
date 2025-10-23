@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -88,12 +88,12 @@ public class Car : MonoBehaviour
                                 BlinkTrayUnlock(tray);
                                 //SingleLevelController.Instance.listCup.Remove(this);
                                 //SingleLevelController.Instance.cups.Remove(this);
-                                /*if (SingleLevelController.Instance.cups.Count == 0)
+                                *//*if (SingleLevelController.Instance.cups.Count == 0)
                                 {
                                     Debug.Log("cups.Count == 0");
                                     SingleLevelController.Instance.isRunning = false;
                                     SingleLevelController.Instance.CheckListCupWhenHaveTray();
-                                }*/
+                                }*//*
                                 SingleLevelController.Instance.totalCup--;
                                 GameUIController.Instance.UpdateTextTotalCup(SingleLevelController.Instance.totalCup);
                                 //Debug.Log(tray.numberTest);
@@ -173,3 +173,4 @@ public class Car : MonoBehaviour
                  });
     }
 }
+*/

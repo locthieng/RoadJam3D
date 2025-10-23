@@ -12578,6 +12578,18 @@ PrefabInstance:
       propertyPath: fixedY
       value: 0.3
       objectReference: {fileID: 0}
+    - target: {fileID: 3610746861549915891, guid: 4effcf23e6f340e4087a275c42495f29, type: 3}
+      propertyPath: objectSize.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3610746861549915891, guid: 4effcf23e6f340e4087a275c42495f29, type: 3}
+      propertyPath: currentCell.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3610746861549915891, guid: 4effcf23e6f340e4087a275c42495f29, type: 3}
+      propertyPath: currentCell.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4769866758264423842, guid: 4effcf23e6f340e4087a275c42495f29, type: 3}
       propertyPath: grid
       value: 
@@ -12667,6 +12679,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 218b69c96166ae847b6fc78c19a1949c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  truePosition: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -404,5 +404,37 @@ public class LevelController : Singleton<LevelController>
         }
         Debug.Log("🗑️ Cleared all cells in grid.");
     }
+    public Vector3 GetWorldPosition(int x, int z)
+    {
+        if (grid == null)
+        {
+            Debug.LogWarning("⚠️ Grid chưa được khởi tạo trong LevelController!");
+            return Vector3.zero;
+        }
+
+        // trả về vị trí thực trong thế giới (theo X,Z grid)
+        Vector3 worldPos = grid.transform.position + new Vector3(x * grid.cellSize, 0, z * grid.cellSize);
+        return worldPos;
+    }
+
+    public Vector2Int GetGridPosition(Vector3 worldPos)
+    {
+        if (grid == null)
+        {
+            Debug.LogWarning("⚠️ Grid chưa được khởi tạo trong LevelController!");
+            return Vector2Int.zero;
+        }
+
+        Vector3 local = worldPos - grid.transform.position;
+        int x = Mathf.RoundToInt(local.x / grid.cellSize);
+        int z = Mathf.RoundToInt(local.z / grid.cellSize);
+        return new Vector2Int(x, z);
+    }
+
+    public bool IsInsideGrid(Vector2Int cell)
+    {
+        return cell.x >= 0 && cell.y >= 0 &&
+               cell.x < grid.size.x && cell.y < grid.size.y;
+    }
 #endif
 }
