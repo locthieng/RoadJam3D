@@ -20,6 +20,13 @@ public class LevelGridController : LevelController
     public GridAlignment gridAlignment = GridAlignment.BottomLeft;
     public GridSpace gridSpace = GridSpace.Horizontal;
     public CellLayout cellLayout = CellLayout.Square;
+    public static new LevelGridController Instance { get; private set; }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        Instance = this;
+    }
 
 #if UNITY_EDITOR
     [ContextMenu("Create Grid")]
@@ -35,7 +42,8 @@ public class LevelGridController : LevelController
         if (grid == null)
         {
             GameObject gridObj = new GameObject("Grid");
-            gridObj.transform.SetParent(transform);
+            //gridObj.transform.SetParent(transform);
+            gridObj.transform.SetParent(Level.transform);
             grid = gridObj.AddComponent<BaseGridSquare>();
         }
 
@@ -47,6 +55,7 @@ public class LevelGridController : LevelController
 
         grid.Create(gridSize.x, gridSize.y, cellPrefab);
         Debug.Log($"✅ Grid {gridSize.x}x{gridSize.y} created for level {name}");
+
     }
 
     [ContextMenu("Clear Grid")]

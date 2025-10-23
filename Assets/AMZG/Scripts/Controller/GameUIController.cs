@@ -52,8 +52,6 @@ public class GameUIController : MonoBehaviour
     private void Start()
     {
         Instance = this;
-        isUION = !GlobalController.Instance.ForTesting;
-        btnToggleUI.SetActive(GlobalController.Instance.ForTesting);
         for (int i = 0; i < canvasScalers.Length; i++)
         {
             canvasScalers[i].matchWidthOrHeight = IsUIMatchWidth ? 0 : 1;
@@ -267,9 +265,9 @@ public class GameUIController : MonoBehaviour
 
     internal void UpdateNoAdsButtons()
     {
-        for (int i = 0; i < btnNoAds.Length; i++)
+        /*for (int i = 0; i < btnNoAds.Length; i++)
         {
             btnNoAds[i].SetActive(!DataController.Instance.Stats.NoAds);
-        }
+        }*/
     }
 }

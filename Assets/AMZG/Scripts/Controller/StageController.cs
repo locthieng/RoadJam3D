@@ -23,17 +23,18 @@ public class StageController : MonoBehaviour
     private int numGoalsDone;
     private int numTotalGoals;
 
+
     public bool IsWaitingForSkinOptions;
     public static bool IsStart { get; set; }
     private const string PlayerEnteredKey = "PlayerEntered";
 
     private void Awake()
     {
-        if (GlobalController.StartSceneName == SceneManager.GetActiveScene().name)
+       /* if (GlobalController.StartSceneName == SceneManager.GetActiveScene().name)
         {
             SceneManager.LoadScene("Splash");
             return;
-        }
+        }*/
         Instance = this;
     }
 
@@ -86,7 +87,7 @@ public class StageController : MonoBehaviour
 
     private void StartLevel()
     {
-        GlobalController.Instance.ShowBanner();
+        //GlobalController.Instance.ShowBanner();
         if (useSavedLevel)
         {
             if (DataController.Instance != null)

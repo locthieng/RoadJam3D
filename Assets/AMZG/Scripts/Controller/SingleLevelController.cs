@@ -13,11 +13,15 @@ public struct StageTransform
 
 public class SingleLevelController : MonoBehaviour
 {
-    [Header("Grid System")]
+    public static SingleLevelController Instance { get; set; }
+
     public BaseGrid grid;
 
     public virtual void SetUp()
     {
+        Instance = this;
+
+
     }
 
     public virtual void StartLevel()

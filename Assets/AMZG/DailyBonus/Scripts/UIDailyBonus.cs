@@ -27,11 +27,11 @@ public class UIDailyBonus : MonoBehaviour
         {
             GlobalController.IsDailyShown = true;
             int gap = 1;
-            if (!string.IsNullOrEmpty(DataController.Instance.LastLogin))
+            /*if (!string.IsNullOrEmpty(DataController.Instance.LastLogin))
             {
                 DateTime lastLogin = DateTime.Parse(DataController.Instance.LastLogin);
                 gap = (DateTime.Today - lastLogin).Days;
-            }
+            }*/
 
             // If more than a day passed since player last logins and user's reward day is before current login day
             if (gap > 0 && GlobalController.RewardDay < GlobalController.LoginDay)
