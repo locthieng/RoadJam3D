@@ -176,6 +176,15 @@ public class LevelEditor : Editor
             levelController.EditorSaveLevel();
         }
         GUILayout.EndHorizontal();
+        
+        EditorGUILayout.Space();
+        EditorGUILayout.Space();
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("SAVE TRAY", new GUILayoutOption[] { GUILayout.Width(250), GUILayout.Height(40) }))
+        {
+            levelController.SaveTruePointTray();
+        }
+        GUILayout.EndHorizontal();
         GUILayout.EndVertical();
 
         // Spawn Point

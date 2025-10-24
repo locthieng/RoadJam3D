@@ -241,6 +241,20 @@ public class LevelController : Singleton<LevelController>
         }
     }
 
+    public void SaveTruePointTray()
+    {
+        Instance = this;
+        if (Level == null)
+        {
+            Level = transform.GetComponentInChildren<SingleLevelController>();
+
+        }
+        for (int i = 0; i < Level.trays.Count; i++)
+        {
+            Level.trays[i].truePosition = Level.trays[i].transform.position;
+        }
+    }    
+
     private void DoSaveAssetDatabase()
     {
         Object instanceRoot = PrefabUtility.GetCorrespondingObjectFromSource(Level.gameObject);
@@ -412,8 +426,9 @@ public class LevelController : Singleton<LevelController>
             return Vector3.zero;
         }
 
-        // trả về vị trí thực trong thế giới (theo X,Z grid)
-        Vector3 worldPos = grid.transform.position + new Vector3(x * grid.cellSize, 0, z * grid.cellSize);
+        // ✅ Đưa vị trí về giữa ô thay vì góc
+        Vector3 worldPos = grid.transform.position
+                         + new Vector3((x + 0.5f) * grid.cellSize, 0, (z + 0.5f) * grid.cellSize);
         return worldPos;
     }
 
@@ -437,4 +452,21 @@ public class LevelController : Singleton<LevelController>
                cell.x < grid.size.x && cell.y < grid.size.y;
     }
 #endif
+
+    public HashSet<Vector2Int> occupiedCells = new HashSet<Vector2Int>();
+
+    public bool IsCellOccupied(Vector2Int cell)
+    {
+        return occupiedCells.Contains(cell);
+    }
+
+    public void SetCellOccupied(Vector2Int cell)
+    {
+        occupiedCells.Add(cell);
+    }
+
+    public void ClearCell(Vector2Int cell)
+    {
+        occupiedCells.Remove(cell);
+    }
 }

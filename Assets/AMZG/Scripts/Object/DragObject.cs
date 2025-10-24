@@ -12,22 +12,23 @@ public class DragObject3D : MonoBehaviour
     public int touchIndex = 0;
 
     [Header("Drag Settings")]
-    public float fixedY = 0.3f;          // luôn giữ Y cố định
-    public float dragLerpSpeed = 15f;    // tốc độ mượt khi kéo
-    public float dragDelay = 0.05f;      // độ trễ sau khi nhấn chuột
-    public float releaseDuration = 0.15f; // thời gian trượt về cell khi thả
+    public float fixedY = 0.3f;
+    public float dragLerpSpeed = 15f;
+    public float dragDelay = 0.05f;
+    public float releaseDuration = 0.15f;
 
     [Header("Grid Info")]
-    public Vector2Int currentCell;        // tọa độ ô hiện tại (x,z)
-    public Vector2Int objectSize = Vector2Int.one; // kích thước object (theo số ô)
-    public bool autoDetectSize = true;    // tự tính size dựa trên localScale
+    public Vector2Int currentCell;
+    public Vector2Int objectSize = Vector2Int.one;
+    public bool autoDetectSize = true;
 
     private Camera cam;
     private bool isDragging = false;
     private float dragStartTime;
-    private Vector3 lastValidPos;
+    public Vector3 lastValidPos;
     private Vector3 targetPos;
     private LevelController level;
+    private Vector2Int originalCell;
 
     private void Start()
     {
@@ -42,28 +43,7 @@ public class DragObject3D : MonoBehaviour
             return;
         }
 
-        if (autoDetectSize)
-            CalculateObjectSize();
-
         lastValidPos = transform.position;
-
-        // Căn đúng vị trí ban đầu trên grid
-        UpdatePositionFromGrid();
-    }
-
-    private void CalculateObjectSize()
-    {
-        // Tự tính số ô mà object chiếm theo kích thước thật
-        float cell = level.grid.cellSize;
-        Vector3 scale = transform.localScale;
-
-        int xSize = Mathf.RoundToInt(scale.x / cell);
-        int zSize = Mathf.RoundToInt(scale.z / cell);
-
-        xSize = Mathf.Max(1, xSize);
-        zSize = Mathf.Max(1, zSize);
-
-        objectSize = new Vector2Int(xSize, zSize);
     }
 
     private Vector3 FingerPosition
@@ -79,15 +59,19 @@ public class DragObject3D : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!IsDraggable) return;
+        if (!IsDraggable || !tray.isActive) return;
+
         dragStartTime = Time.time;
         isDragging = true;
-        Debug.Log("OnMouseDown");
+        originalCell = currentCell;
+
+        // 🔹 Giải phóng ô cũ tạm thời để có thể thả lại
+        level.occupiedCells.Remove(currentCell);
     }
 
     private void OnMouseDrag()
     {
-        if (!IsDraggable) return;
+        if (!IsDraggable || !tray.isActive) return;
         if (Time.time - dragStartTime < dragDelay) return;
 
         Ray ray = cam.ScreenPointToRay(FingerPosition);
@@ -98,44 +82,60 @@ public class DragObject3D : MonoBehaviour
             Vector3 hitPoint = ray.GetPoint(distance);
             hitPoint.y = fixedY;
 
-            transform.position = Vector3.Lerp(transform.position, hitPoint, Time.deltaTime * dragLerpSpeed);
-            lastValidPos = transform.position;
+            Vector2Int gridPos = level.GetGridPosition(hitPoint);
+
+            gridPos.x = Mathf.Clamp(gridPos.x, 0, level.grid.size.x - objectSize.x);
+            gridPos.y = Mathf.Clamp(gridPos.y, 0, level.grid.size.y - objectSize.y);
+
+            if (gridPos != currentCell)
+            {
+                currentCell = gridPos;
+                Vector3 cellWorldPos = level.GetWorldPosition(gridPos.x, gridPos.y);
+                cellWorldPos.y = fixedY;
+
+                transform.position = cellWorldPos;
+                lastValidPos = cellWorldPos;
+            }
         }
     }
 
     private void OnMouseUp()
     {
-        if (!isDragging) return;
+        if (!IsDraggable || !tray.isActive) return;
         isDragging = false;
-        Debug.Log("OnMouseUp");
         Release();
     }
 
     private void Release()
     {
-        if (!IsDraggable) return;
+        if (!IsDraggable || !tray.isActive) return;
 
-        // Tính cell gần nhất từ vị trí hiện tại
         Vector2Int gridPos = level.GetGridPosition(lastValidPos);
 
-        // Giới hạn trong phạm vi grid (để không tràn)
         gridPos.x = Mathf.Clamp(gridPos.x, 0, level.grid.size.x - objectSize.x);
         gridPos.y = Mathf.Clamp(gridPos.y, 0, level.grid.size.y - objectSize.y);
 
-        currentCell = gridPos;
+        if (level.occupiedCells.Contains(gridPos))
+        {
+            targetPos = level.GetWorldPosition(originalCell.x, originalCell.y);
+            level.occupiedCells.Add(originalCell); 
+            currentCell = originalCell;
+        }
+        else
+        {
+            currentCell = gridPos;
+            level.occupiedCells.Add(gridPos);
+            targetPos = level.GetWorldPosition(gridPos.x, gridPos.y);
+        }
 
-        // ✅ Lấy đúng vị trí góc dưới-trái của ô
-        targetPos = level.GetWorldPosition(gridPos.x, gridPos.y);
         targetPos.y = fixedY;
-
         StopAllCoroutines();
         StartCoroutine(SmoothMove(targetPos, releaseDuration));
-    }
 
-    private void UpdatePositionFromGrid()
-    {
-        Vector3 basePos = level.GetWorldPosition(currentCell.x, currentCell.y);
-        transform.position = new Vector3(basePos.x, fixedY, basePos.z);
+        if (targetPos == tray.truePosition)
+        {
+            tray.isActive = false;
+        }
     }
 
     private IEnumerator SmoothMove(Vector3 target, float duration)
