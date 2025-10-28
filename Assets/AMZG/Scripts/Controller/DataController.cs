@@ -22,10 +22,10 @@ public class DataController : MonoBehaviour
     public void LoadData()
     {
         // Data
+        Debug.Log("LoadData");
         bool resetData = PlayerPrefs.GetInt("Data163920210421", 1) == 1;
         PlayerPrefs.SetInt("Data163920210421", 0);
         string data = resetData ? "" : PlayerPrefs.GetString(dataName, "");
-
         if (string.IsNullOrEmpty(data))
         {
             Data = new GameData()

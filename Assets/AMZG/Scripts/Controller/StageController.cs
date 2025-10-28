@@ -30,11 +30,11 @@ public class StageController : MonoBehaviour
 
     private void Awake()
     {
-       /* if (GlobalController.StartSceneName == SceneManager.GetActiveScene().name)
+        if (GlobalController.StartSceneName == SceneManager.GetActiveScene().name)
         {
             SceneManager.LoadScene("Splash");
             return;
-        }*/
+        }
         Instance = this;
     }
 
@@ -92,6 +92,7 @@ public class StageController : MonoBehaviour
         {
             if (DataController.Instance != null)
             {
+                Debug.Log("!=null");
                 if (GlobalController.ReplayingLevel > 0)
                 {
                     GlobalController.CurrentLevelIndex = GlobalController.ReplayingLevel;
@@ -99,9 +100,11 @@ public class StageController : MonoBehaviour
             }
             else
             {
+                Debug.Log("==null");
                 GlobalController.CurrentLevelIndex = 1;
             }
         }
+
         mapIndex = LevelController.Instance.LoadLevel(GlobalController.CurrentLevelIndex, LevelLimit);
         StartCoroutine(CoStartLevel());
     }
@@ -120,6 +123,8 @@ public class StageController : MonoBehaviour
             yield return new WaitForSeconds(0.02f);
             LevelController.Instance.Level.StartLevel();
             playTimeInSeconds = Time.realtimeSinceStartup;
+            yield return new WaitForSeconds(0.5f);
+            //LevelController.Instance.Level.isStart = true;
         }
     }
 

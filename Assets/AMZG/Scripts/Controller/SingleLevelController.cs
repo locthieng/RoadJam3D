@@ -16,30 +16,36 @@ public class SingleLevelController : MonoBehaviour
     public static SingleLevelController Instance { get; private set; }
 
     [Header("Level References")]
-    public BaseGrid grid;               // Grid chứa thông tin size + cellSize
-    public List<Tray> trays = new List<Tray>();  // Danh sách tray sẽ được random
+    public BaseGrid grid;               
+    public List<Tray> trays = new List<Tray>();
+    public List<Cell> cells = new List<Cell>();
+    public List<PathTray> pathTrays = new List<PathTray>();
 
     [Header("Tray Settings")]
-    public float trayY = 0.3f;          // Chiều cao cố định của tray trên mặt phẳng
+    public float trayY = 0.3f;
+    public Transform tfListTray;
+    private bool isWin;
 
-    // -------------------------
-    public virtual void SetUp()
+    private void Awake()
     {
         Instance = this;
+    }
 
-        if (grid == null)
+    private void Update()
+    {
+        if (!isWin)
         {
-            Debug.LogError("❌ Grid chưa được gán trong SingleLevelController!");
-            return;
-        }
+            CheckWin();
+        }    
+    }
 
-        if (trays == null || trays.Count == 0)
+    public virtual void SetUp()
+    {
+        for (int i = 0; i < cells.Count; i++ )
         {
-            Debug.LogWarning("⚠️ Chưa có tray nào trong danh sách trays!");
-            return;
-        }
+            cells[i].isBlocked = false;
+        }    
 
-        // ✅ Tạo danh sách tất cả ô trong grid
         List<Vector2Int> availableCells = new List<Vector2Int>();
         for (int x = 0; x < grid.size.x; x++)
         {
@@ -49,12 +55,10 @@ public class SingleLevelController : MonoBehaviour
             }
         }
 
-        // ✅ Dọn danh sách occupied trước khi setup lại
-        LevelController.Instance.occupiedCells.Clear();
-
-        // ✅ Random vị trí cho từng Tray (không trùng nhau)
-        foreach (Tray tray in trays)
+        for (int i = 0; i < trays.Count; i++)
         {
+            Tray tray = trays[i];
+            tray.SetUp();
             if (availableCells.Count == 0)
             {
                 Debug.LogWarning("⚠️ Hết ô trống để đặt Tray!");
@@ -65,25 +69,74 @@ public class SingleLevelController : MonoBehaviour
             Vector2Int cell = availableCells[index];
             availableCells.RemoveAt(index);
 
-            // ✅ Đặt vào world position của cell
             Vector3 worldPos = LevelController.Instance.GetWorldPosition(cell.x, cell.y);
             worldPos.y = 0.3f;
 
             tray.transform.position = worldPos;
 
-            // ✅ Nếu có DragObject3D, đồng bộ cell
             DragObject3D drag = tray.GetComponent<DragObject3D>();
             if (drag != null)
             {
-                drag.currentCell = cell;
-                drag.lastValidPos = worldPos;
+                Cell c = GetCell(drag.transform.position);
+                if (c != null)
+                {
+                    c.isBlocked = true;
+                }
             }
-
-            // ✅ Đánh dấu ô này là "đã bị chiếm"
-            LevelController.Instance.occupiedCells.Add(cell);
         }
 
-        Debug.Log($"✅ Đã random {trays.Count} tray, {LevelController.Instance.occupiedCells.Count} ô bị chiếm.");
+
+    }
+
+    public Cell GetCell(Vector3 pos)
+    {
+        for (int i = 0; i < cells.Count; i++)
+        {
+            if (pos == cells[i].transform.position)
+            {
+                return cells[i];
+            }    
+        }
+        return null;
+    }    
+
+    public Transform GetNearestCell(Vector3 pos)
+    {
+        Transform nearest = null;
+        float minDist = float.MaxValue;
+
+        foreach (var cell in cells)
+        {
+            if (cell == null) continue;
+            float dist = Vector3.Distance(pos, cell.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearest = cell.transform;
+            }
+        }
+        return nearest;
+    }
+
+    public void CheckWin()
+    {
+        Debug.Log("CheckWin");
+
+        for (int i = 0; i < pathTrays.Count; i++)
+        {
+            if (pathTrays[i].listCars.Count > 0)
+            {
+                Debug.Log("CheckWin1");
+                return;
+            }
+
+            if (i == pathTrays.Count - 1)
+            {
+                Debug.Log("CheckWin2");
+                isWin = true;
+                StageController.Instance.End(isWin);
+            }    
+        }
     }
 
     public virtual void StartLevel() { }

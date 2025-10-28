@@ -379,24 +379,51 @@ public class LevelController : Singleton<LevelController>
             return;
         }
 
+        if (Level == null)
+        {
+            Level = transform.GetComponentInChildren<SingleLevelController>();
+            if (Level == null)
+            {
+                Debug.LogWarning("⚠️ Không tìm thấy SingleLevelController trong scene!");
+                return;
+            }
+        }
+
         // Nếu chưa có grid => tạo mới
         if (grid == null)
         {
             GameObject gridObj = new GameObject("Grid");
-            //gridObj.transform.SetParent(transform);
             gridObj.transform.SetParent(Level.transform);
             grid = gridObj.AddComponent<BaseGridSquare>();
         }
 
+        // Cấu hình grid
         grid.cellSize = cellSize;
         grid.size = gridSize;
         grid.alignment = gridAlignment;
         grid.space = gridSpace;
         grid.layout = cellLayout;
 
-        grid.Create(gridSize.x, gridSize.y, cellPrefab);
-        Debug.Log($"✅ Grid {gridSize.x}x{gridSize.y} created for level {name}");
+        // Xóa ô cũ nếu có
+        for (int i = grid.transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(grid.transform.GetChild(i).gameObject);
+        }
 
+        // ✅ Tạo grid mới
+        grid.Create(gridSize.x, gridSize.y, cellPrefab);
+        Debug.Log($"✅ Grid {gridSize.x}x{gridSize.y} created for level {Level.name}");
+
+        // ✅ Gán tất cả cell vừa tạo vào Level.cells
+        Level.cells.Clear();
+        for (int i = 0; i < grid.transform.childCount; i++)
+        {
+            Cell cell = grid.transform.GetChild(i).GetComponent<Cell>();
+            if (cell != null)
+                Level.cells.Add(cell);
+        }
+
+        Debug.Log($"🟩 Đã thêm {Level.cells.Count} cell vào Level.cells.");
     }
 
     [ContextMenu("Clear Grid")]
@@ -416,6 +443,8 @@ public class LevelController : Singleton<LevelController>
             else
                 DestroyImmediate(child.gameObject);
         }
+
+        Level.cells.Clear();
         Debug.Log("🗑️ Cleared all cells in grid.");
     }
     public Vector3 GetWorldPosition(int x, int z)
@@ -453,20 +482,4 @@ public class LevelController : Singleton<LevelController>
     }
 #endif
 
-    public HashSet<Vector2Int> occupiedCells = new HashSet<Vector2Int>();
-
-    public bool IsCellOccupied(Vector2Int cell)
-    {
-        return occupiedCells.Contains(cell);
-    }
-
-    public void SetCellOccupied(Vector2Int cell)
-    {
-        occupiedCells.Add(cell);
-    }
-
-    public void ClearCell(Vector2Int cell)
-    {
-        occupiedCells.Remove(cell);
-    }
 }

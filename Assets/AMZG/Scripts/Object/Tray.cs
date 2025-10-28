@@ -6,15 +6,9 @@ public class Tray : MonoBehaviour
 {
     public Vector3 truePosition;
     public bool isActive;
-    // Start is called before the first frame update
-    void Start()
+    
+    public void SetUp()
     {
-       isActive = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        isActive = false;
     }
 }
