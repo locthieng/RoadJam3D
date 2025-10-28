@@ -15,6 +15,7 @@ public class LevelEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        DrawDefaultInspector();
         levelController = (LevelController)target;
         GUIStyle headerStyle = new GUIStyle();
         headerStyle.richText = true;

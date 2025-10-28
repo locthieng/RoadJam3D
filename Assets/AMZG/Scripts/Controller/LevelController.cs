@@ -7,6 +7,7 @@ using UnityEditor.AI;
 #endif
 using UnityEngine;
 using UnityEngine.AI;
+using Object = UnityEngine.Object;
 
 public class LevelController : Singleton<LevelController>
 {
@@ -16,21 +17,22 @@ public class LevelController : Singleton<LevelController>
     private string levelPrefabBasePath = "Base/";
     private string prefabPath = "/AMZG/Prefabs/Resources/";
     private const string levelPrefix = "Level_";
-    public int CurrentLevel = 0;
-    public SingleLevelController LoadedLevel;
-    public SingleLevelController Level;
-    public int levelIndex;
-    public List<LevelAsset> ListLevelSpecials = new List<LevelAsset>();
+    [HideInInspector] public int CurrentLevel = 0;
+    [HideInInspector] public SingleLevelController LoadedLevel;
+    [HideInInspector] public SingleLevelController Level;
+    [HideInInspector] public int levelIndex;
+    [HideInInspector] public List<LevelAsset> ListLevelSpecials = new List<LevelAsset>();
+    public MatController matController;
     //public StoryAsset[] ListStoryAssets;
 
     [Header("GRID SETTINGS")]
-    public BaseGrid grid;          // Grid được gắn vào level
-    public GameObject cellPrefab;  // Prefab của ô (Cell)
-    public Vector2Int gridSize = new Vector2Int(10, 10);
-    public float cellSize = 1f;
-    public GridAlignment gridAlignment = GridAlignment.BottomLeft;
-    public GridSpace gridSpace = GridSpace.Horizontal;
-    public CellLayout cellLayout = CellLayout.Square;
+    [HideInInspector] public BaseGrid grid;          // Grid được gắn vào level
+    [HideInInspector] public GameObject cellPrefab;  // Prefab của ô (Cell)
+    [HideInInspector] public Vector2Int gridSize = new Vector2Int(10, 10);
+    [HideInInspector] public float cellSize = 1f;
+    [HideInInspector] public GridAlignment gridAlignment = GridAlignment.BottomLeft;
+    [HideInInspector] public GridSpace gridSpace = GridSpace.Horizontal;
+    [HideInInspector] public CellLayout cellLayout = CellLayout.Square;
 
     protected override void Awake()
     {
